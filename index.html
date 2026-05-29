@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ИИ-тренер по Дураку — обыгрывай всех и расти в уровне</title>
+  <meta name="description" content="ИИ-тренер по Дураку подсказывает лучший ход, показывает вероятность победы и разбирает твои ошибки после партии. Обыгрывает сильного бота в 9 из 10 партий. Ранний доступ -50%." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="ИИ-тренер по Дураку — обыгрывай всех" />
+  <meta property="og:description" content="Лучший ход, вероятность победы в %, разбор ошибок. Обыгрывает сильного бота 9 из 10. Ранний доступ -50%." />
+  <meta property="og:locale" content="ru_RU" />
+
+  <style>
+    :root {
+      --bg: #f5f7fc;
+      --surface: #ffffff;
+      --ink: #14182a;
+      --muted: #5b6478;
+      --line: #e6e9f2;
+      --brand: #5b2bff;        /* фиолетовый — премиальность/ум */
+      --brand-2: #9b3bff;
+      --brand-3: #ff3d8b;      /* розовый акцент в градиенте */
+      --cta: #ff7a00;          /* оранжевый CTA — максимум кликов */
+      --cta-dark: #e96d00;
+      --go: #12b76a;           /* зелёный — деньги/успех/гарантия */
+      --go-soft: #e7f8ef;
+      --warn: #ff4d4f;
+      --shadow: 0 16px 40px rgba(34, 26, 88, .12);
+      --shadow-cta: 0 10px 24px rgba(255, 122, 0, .35);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.55; -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+    .center { text-align: center; }
+
+    /* ===== URGENCY BAR ===== */
+    .urg {
+      background: linear-gradient(90deg, var(--brand), var(--brand-3));
+      color: #fff; text-align: center; font-size: 14px; font-weight: 600;
+      padding: 9px 16px; position: sticky; top: 0; z-index: 40;
+    }
+    .urg b { font-weight: 800; }
+    .urg .spots { color: #ffe27a; }
+    .urg-short { display: none; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      appearance: none; border: 0; cursor: pointer; font: inherit; font-weight: 800;
+      padding: 16px 30px; border-radius: 14px; font-size: 17px; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 10px; justify-content: center;
+      transition: transform .08s ease, box-shadow .15s ease, filter .15s ease;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-cta { background: var(--cta); color: #fff; box-shadow: var(--shadow-cta); }
+    .btn-cta:hover { filter: brightness(1.05); box-shadow: 0 14px 30px rgba(255,122,0,.45); }
+    .btn-ghost { background: rgba(255,255,255,.14); color: #fff; border: 1.5px solid rgba(255,255,255,.5); }
+    .btn-ghost:hover { background: rgba(255,255,255,.24); }
+    .btn-dark { background: var(--ink); color: #fff; }
+    .btn-dark:hover { filter: brightness(1.15); }
+    .btn-lg { padding: 18px 38px; font-size: 18px; }
+    .sub-note { font-size: 13px; opacity: .85; margin-top: 12px; }
+
+    /* ===== HERO ===== */
+    .hero {
+      background:
+        radial-gradient(900px 500px at 85% -10%, rgba(255,61,139,.45), transparent 60%),
+        radial-gradient(700px 500px at 0% 110%, rgba(0,200,255,.35), transparent 55%),
+        linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 55%, #6a2bff 100%);
+      color: #fff; position: relative; overflow: hidden;
+    }
+    .hero .wrap { padding: 70px 20px 80px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 44px; align-items: center; }
+    .badge {
+      display: inline-flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 700;
+      background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.3);
+      padding: 7px 14px; border-radius: 999px; margin-bottom: 22px;
+    }
+    h1 { font-size: clamp(32px, 5.2vw, 56px); line-height: 1.05; letter-spacing: -.02em; font-weight: 850; }
+    h1 .u { background: linear-gradient(90deg, #ffe27a, #ffd000); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero .sub { font-size: clamp(16px, 2.6vw, 20px); opacity: .95; margin: 22px 0 0; max-width: 540px; }
+    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 32px; }
+    .trust { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 30px; }
+    .trust div { font-size: 13px; opacity: .92; }
+    .trust b { display: block; font-size: 24px; font-weight: 850; }
+
+    /* MOCK ADVISOR CARD */
+    .mock {
+      background: rgba(255,255,255,.97); color: var(--ink); border-radius: 20px;
+      box-shadow: 0 30px 60px rgba(20,10,60,.4); padding: 20px; transform: rotate(1.5deg);
+    }
+    .mock .mock-h { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 15px; }
+    .mock .tag { font-size: 11px; font-weight: 700; color: var(--go); background: var(--go-soft); padding: 4px 10px; border-radius: 999px; }
+    .mock .best { margin-top: 14px; background: linear-gradient(135deg, #f3eeff, #fdeeff); border: 1px solid #ead9ff; border-radius: 14px; padding: 14px; }
+    .mock .best .lbl { font-size: 12px; color: var(--muted); }
+    .mock .best .mv { font-size: 20px; font-weight: 850; margin-top: 2px; }
+    .mock .best .pct { float: right; font-size: 22px; font-weight: 850; color: var(--go); }
+    .mock .row { display: flex; justify-content: space-between; font-size: 14px; padding: 9px 4px; border-top: 1px solid var(--line); }
+    .mock .row .p { font-weight: 700; }
+    .mock .row .p.bad { color: var(--warn); }
+    .mock .row .p.mid { color: #c98a00; }
+    .suit-r { color: var(--warn); } .suit-b { color: var(--ink); }
+
+    /* ===== SECTIONS ===== */
+    section { padding: 64px 0; }
+    .kicker { color: var(--brand); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; font-size: 13px; text-align: center; }
+    h2 { font-size: clamp(26px, 4.4vw, 40px); text-align: center; letter-spacing: -.02em; margin-top: 8px; font-weight: 850; }
+    .lead { text-align: center; color: var(--muted); margin: 14px auto 0; max-width: 600px; font-size: 17px; }
+
+    /* COMPARISON */
+    .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 38px; }
+    .cmp .col { border-radius: var(--radius); padding: 26px; }
+    .cmp .bad { background: #fff4f4; border: 1px solid #ffd9d9; }
+    .cmp .good { background: var(--go-soft); border: 1px solid #bfe9d2; }
+    .cmp h3 { font-size: 18px; margin-bottom: 14px; }
+    .cmp ul { list-style: none; display: grid; gap: 10px; }
+    .cmp li { font-size: 15px; padding-left: 28px; position: relative; }
+    .cmp .bad li::before { content: "✕"; position: absolute; left: 0; color: var(--warn); font-weight: 800; }
+    .cmp .good li::before { content: "✓"; position: absolute; left: 0; color: var(--go); font-weight: 800; }
+
+    /* FEATURES */
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 40px; }
+    .feat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); }
+    .feat .ico { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 26px;
+      background: linear-gradient(135deg, #f0eaff, #ffe9f4); }
+    .feat h3 { font-size: 18px; margin: 16px 0 8px; }
+    .feat p { color: var(--muted); font-size: 15px; }
+
+    /* STEPS */
+    .steps { counter-reset: s; margin-top: 38px; display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+    .step { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow); }
+    .step .n { counter-increment: s; width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; display: grid; place-items: center; font-weight: 850; }
+    .step .n::before { content: counter(s); }
+    .step b { display: block; margin: 14px 0 6px; font-size: 17px; }
+    .step span { color: var(--muted); font-size: 15px; }
+
+    /* TESTIMONIALS */
+    .quotes { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 38px; }
+    .q { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+    .q .stars { color: #ffb400; font-size: 16px; }
+    .q p { margin: 12px 0; font-size: 15px; }
+    .q .who { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .q .av { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; display: grid; place-items: center; font-weight: 800; }
+    .q .who b { display: block; } .q .who span { color: var(--muted); font-size: 12px; }
+
+    /* PRICING */
+    .price-sec { background: linear-gradient(135deg, #1a1140, #2a1466); color: #fff; }
+    .price-sec h2, .price-sec .kicker { color: #fff; }
+    .price-sec .kicker { color: #ffd000; }
+    .price-sec .lead { color: rgba(255,255,255,.8); }
+    .pricebox { max-width: 460px; margin: 36px auto 0; background: #fff; color: var(--ink); border-radius: 22px; padding: 34px; box-shadow: 0 30px 70px rgba(0,0,0,.35); position: relative; }
+    .ribbon { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--cta); color: #fff; font-weight: 800; font-size: 13px; padding: 7px 18px; border-radius: 999px; white-space: nowrap; box-shadow: var(--shadow-cta); }
+    .pricebox .old { color: var(--muted); text-decoration: line-through; font-size: 20px; margin-top: 8px; }
+    .pricebox .now { font-size: 56px; font-weight: 850; line-height: 1; }
+    .pricebox .now small { font-size: 18px; color: var(--muted); font-weight: 600; }
+    .pricebox ul { list-style: none; text-align: left; margin: 22px 0; display: grid; gap: 11px; }
+    .pricebox li { font-size: 15px; padding-left: 28px; position: relative; }
+    .pricebox li::before { content: "✓"; position: absolute; left: 0; color: var(--go); font-weight: 800; }
+    .countdown { display: flex; gap: 10px; justify-content: center; margin: 6px 0 18px; }
+    .cd { background: #f1f0fb; border-radius: 12px; padding: 10px 14px; min-width: 64px; }
+    .cd b { font-size: 26px; font-weight: 850; display: block; }
+    .cd span { font-size: 11px; color: var(--muted); }
+    .guarantee { display: flex; align-items: center; gap: 14px; max-width: 460px; margin: 22px auto 0; background: rgba(18,183,106,.15); border: 1px solid rgba(18,183,106,.4); border-radius: 14px; padding: 16px 18px; }
+    .guarantee .g-ico { font-size: 30px; } .guarantee p { font-size: 14px; color: rgba(255,255,255,.92); }
+
+    /* FAQ */
+    details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 22px; margin-top: 12px; box-shadow: 0 4px 14px rgba(20,10,60,.05); }
+    details summary { cursor: pointer; font-weight: 700; list-style: none; font-size: 16px; }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::after { content: "+"; float: right; color: var(--brand); font-weight: 800; }
+    details[open] summary::after { content: "–"; }
+    details p { color: var(--muted); font-size: 15px; margin-top: 12px; }
+
+    /* FINAL CTA */
+    .final { background: linear-gradient(135deg, var(--brand), var(--brand-3)); color: #fff; text-align: center; border-radius: 24px; padding: 54px 28px; margin: 0 0 20px; }
+    .final h2 { color: #fff; }
+    .final .lead { color: rgba(255,255,255,.9); }
+
+    footer { text-align: center; color: var(--muted); font-size: 13px; padding: 36px 0 110px; }
+    footer a { color: var(--brand); }
+
+    /* STICKY MOBILE CTA */
+    .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--line); padding: 12px 16px; display: none; z-index: 45; box-shadow: 0 -8px 24px rgba(20,10,60,.12); }
+    .sticky-cta .btn { width: 100%; }
+
+    /* MODAL */
+    .overlay { position: fixed; inset: 0; background: rgba(20,12,50,.6); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 60; }
+    .overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 22px; padding: 32px; max-width: 440px; width: 100%; box-shadow: 0 40px 80px rgba(0,0,0,.4); }
+    .modal h3 { font-size: 23px; }
+    .modal p { color: var(--muted); font-size: 14px; margin-top: 8px; }
+    .modal label { display:block; font-size: 13px; color: var(--muted); margin: 20px 0 6px; font-weight: 600; }
+    .modal input { width: 100%; padding: 14px 15px; border-radius: 12px; border: 1.5px solid var(--line); background: #fbfbfe; color: var(--ink); font: inherit; }
+    .modal input:focus { outline: none; border-color: var(--brand); }
+    .modal .btn { width: 100%; margin-top: 20px; }
+    .modal .close { float: right; cursor: pointer; color: var(--muted); font-size: 26px; line-height: 1; }
+    @media (max-width: 500px) {
+      .modal { padding: 22px 18px; border-radius: 16px; }
+      .overlay { padding: 12px; }
+    }
+    .thanks { display: none; text-align: center; }
+    .thanks .big { font-size: 50px; }
+    .err { color: var(--warn); font-size: 13px; margin-top: 8px; display: none; }
+
+    @media (max-width: 860px) {
+      .hero .wrap { grid-template-columns: 1fr; padding: 44px 20px 56px; }
+      .mock { transform: none; max-width: 420px; margin: 8px auto 0; }
+      .cards, .steps, .quotes, .cmp { grid-template-columns: 1fr; }
+      .sticky-cta { display: block; }
+      .hero-cta .btn { flex: 1; }
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 32px; }
+      h2 { font-size: 24px; }
+      .urg { font-size: 13px; padding: 8px 12px; }
+      .urg-full { display: none; }
+      .urg-short { display: inline; }
+      .section { padding: 44px 0; }
+      .wrap { padding-left: 16px; padding-right: 16px; }
+      .hero-cta { flex-direction: column; }
+      .hero-cta .btn { width: 100%; }
+      .trust b { font-size: 20px; }
+      .trust div { font-size: 12px; }
+      .price-box { padding: 28px 20px; }
+      .price-num { font-size: 52px; }
+      .mock { font-size: 13px; }
+      .cmp-row { font-size: 13px; }
+      footer { padding: 28px 16px 120px; font-size: 12px; }
+    }
+    @media (max-width: 360px) {
+      .trust { gap: 10px; }
+      .trust b { font-size: 18px; }
+      .trust div { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- URGENCY BAR -->
+  <div class="urg">
+    <span class="urg-full">🔥 Ранний доступ со скидкой <b>−50%</b> · осталось <span class="spots" id="spots">37</span> мест из 100 · цена фиксируется навсегда</span>
+    <span class="urg-short">🔥 <b>−50%</b> · осталось <span class="spots">37</span> мест · цена навсегда</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <span class="badge">🃏 ИИ-тренер · ранний доступ открыт</span>
+        <h1>Обыгрывай в Дурака <span class="u">почти любого</span></h1>
+        <p class="sub">
+          ИИ подсказывает лучший ход, показывает вероятность победы в&nbsp;процентах и
+          разбирает твои ошибки после партии. В&nbsp;тестах обыгрывает сильного бота
+          в&nbsp;<b>9&nbsp;партиях из&nbsp;10</b>.
+        </p>
+        <div class="hero-cta">
+          <button class="btn btn-cta btn-lg" data-cta="preorder">Забрать доступ за 149&nbsp;₽ →</button>
+          <button class="btn btn-ghost btn-lg" data-cta="waitlist">Узнать о запуске</button>
+        </div>
+        <div class="sub-note">💳 Оплата только при запуске · отмена в любой момент</div>
+        <div class="trust">
+          <div><b>9/10</b>побед против сильного бота</div>
+          <div><b>10+</b>ходов просчёта вперёд</div>
+          <div><b>0&nbsp;₽</b>пока не запустимся</div>
+        </div>
+      </div>
+
+      <!-- MOCK ADVISOR -->
+      <div class="mock" aria-hidden="true">
+        <div class="mock-h"><span>Рекомендация ИИ</span><span class="tag">● считает за 0.4 c</span></div>
+        <div class="lbl" style="margin:10px 0 -2px; color:var(--muted); font-size:12px;">Соперник атакует <span class="suit-r">9♥</span> · козырь <span class="suit-r">♦</span> · у тебя пара королей <span class="suit-r">К♥</span><span class="suit-b">К♠</span></div>
+        <div class="best">
+          <span class="pct">74.0%</span>
+          <div class="lbl">Лучший ход <span style="color:var(--brand);font-weight:700;">· неочевидный</span></div>
+          <div class="mv">Защита: <span class="suit-r">6♦</span> → <span class="suit-r">9♥</span> (козырь)</div>
+        </div>
+        <div class="row"><span>Защита: <span class="suit-r">К♥</span> → <span class="suit-r">9♥</span></span><span class="p mid">61.2%</span></div>
+        <div class="row"><span>Взять карты</span><span class="p bad">33.0%</span></div>
+        <div class="lbl" style="margin-top:12px; color:var(--muted); font-size:12px;">Неочевидно: не бей королём — сохрани пару <span class="suit-r">К♥</span><span class="suit-b">К♠</span> для своей атаки. Дешёвый козырь решает выгоднее.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARISON -->
+  <section id="sec-compare">
+    <div class="wrap">
+      <div class="kicker">Зачем это нужно</div>
+      <h2>Разница, которую видно с первой партии</h2>
+      <div class="cmp">
+        <div class="col bad">
+          <h3>😕 Без тренера</h3>
+          <ul>
+            <li>Сливаешь козыри не вовремя</li>
+            <li>Берёшь карты, когда можно было отбиться</li>
+            <li>Не понимаешь, где именно проиграл партию</li>
+            <li>Уровень не растёт годами</li>
+          </ul>
+        </div>
+        <div class="col good">
+          <h3>🚀 С ИИ-тренером</h3>
+          <ul>
+            <li>Видишь лучший ход и вероятность победы</li>
+            <li>Понимаешь, почему так, а не иначе</li>
+            <li>Разбор каждой партии: где ошибка и её цена</li>
+            <li>Реальный рост уровня за недели, а не годы</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="sec-features" style="background:#fff;">
+    <div class="wrap">
+      <div class="kicker">Возможности</div>
+      <h2>Не просто бот — личный тренер</h2>
+      <p class="lead">Делает сильнее именно тебя, а не играет вместо тебя.</p>
+      <div class="cards">
+        <div class="feat"><div class="ico">🎯</div><h3>Лучший ход сейчас</h3><p>Во время партии — оптимальный ход и вероятность победы в процентах. Без догадок.</p></div>
+        <div class="feat"><div class="ico">🔍</div><h3>Разбор партии</h3><p>После игры показывает, где ты ошибся, какой ход был верным и сколько это стоило.</p></div>
+        <div class="feat"><div class="ico">📈</div><h3>Рост уровня</h3><p>Статистика твоих типичных ошибок и прогресса. Видно, как игра крепнет неделя за неделей.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section id="sec-how">
+    <div class="wrap">
+      <div class="kicker">Как это работает</div>
+      <h2>Три простых шага</h2>
+      <div class="steps">
+        <div class="step"><div class="n"></div><b>Открой партию</b><span>Играй прямо в приложении или введи свои карты, козырь и ходы.</span></div>
+        <div class="step"><div class="n"></div><b>ИИ считает варианты</b><span>Тот же класс алгоритмов, что за шахматными и покерными ИИ — поиск в условиях неполной информации.</span></div>
+        <div class="step"><div class="n"></div><b>Делай сильный ход</b><span>Получаешь лучший ход, % победы и объяснение. Дальше — разбор партии.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <!-- ⚠️ ВАЖНО: замените на РЕАЛЬНЫЕ отзывы перед публичным запуском.
+       До появления реальных пользователей этот блок можно скрыть (display:none),
+       чтобы не вводить в заблуждение. Сейчас отзывы — иллюстративные. -->
+  <section style="background:#fff;" id="reviews">
+    <div class="wrap">
+      <div class="kicker">Отзывы первых тестеров</div>
+      <h2>Что говорят те, кто уже попробовал</h2>
+      <div class="quotes">
+        <div class="q"><div class="stars">★★★★★</div><p>«Перестал сливать козыри в начале. За пару недель выиграл серию у друзей, которым раньше проигрывал.»</p><div class="who"><div class="av">А</div><div><b>Алексей</b><span>играет 5+ лет</span></div></div></div>
+        <div class="q"><div class="stars">★★★★★</div><p>«Разбор партии — топ. Наконец вижу, где именно теряю, а не просто „не повезло“.»</p><div class="who"><div class="av">М</div><div><b>Марина</b><span>любитель</span></div></div></div>
+        <div class="q"><div class="stars">★★★★★</div><p>«Проценты по ходам затягивают. Теперь думаю на пару ходов вперёд автоматически.»</p><div class="who"><div class="av">Д</div><div><b>Дмитрий</b><span>онлайн-игрок</span></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="price-sec" id="price">
+    <div class="wrap">
+      <div class="kicker">Ранний доступ</div>
+      <h2>Зафиксируй −50% навсегда</h2>
+      <p class="lead">Цена раннего доступа сохранится за тобой даже после повышения.</p>
+
+      <div class="pricebox">
+        <div class="ribbon">🔥 Только для первых 100 человек</div>
+        <div class="center">
+          <div class="old">299 ₽ / мес</div>
+          <div class="now">149&nbsp;₽<small>/мес</small></div>
+        </div>
+        <div class="countdown" id="countdown">
+          <div class="cd"><b id="cd-d">02</b><span>дней</span></div>
+          <div class="cd"><b id="cd-h">00</b><span>часов</span></div>
+          <div class="cd"><b id="cd-m">00</b><span>минут</span></div>
+          <div class="cd"><b id="cd-s">00</b><span>секунд</span></div>
+        </div>
+        <ul>
+          <li>Подсказка лучшего хода + вероятность победы</li>
+          <li>Полный разбор партий с ценой ошибок</li>
+          <li>Статистика прогресса и слабых мест</li>
+          <li>Цена 149 ₽ закреплена навсегда</li>
+        </ul>
+        <button class="btn btn-cta btn-lg" data-cta="preorder" style="width:100%;">Забронировать за 149&nbsp;₽ →</button>
+        <div class="center sub-note" style="color:var(--muted);">💳 Деньги спишутся только при запуске. Сейчас — бронь места и цены.</div>
+      </div>
+
+      <div class="guarantee">
+        <div class="g-ico">🛡️</div>
+        <p><b>Без риска.</b> Сейчас ты ничего не платишь — только бронируешь место и цену. При запуске сможешь отменить в один клик, если не подойдёт.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="sec-faq">
+    <div class="wrap" style="max-width:780px;">
+      <div class="kicker">Вопросы</div>
+      <h2>Частые вопросы</h2>
+      <details open><summary>Насколько сильный ИИ на самом деле?</summary><p>В наших тестах движок обыгрывает сильную эвристику примерно в 9 партиях из 10. В основе — поиск по дереву в условиях неполной информации, тот же класс методов, что в покерных солверах и шахматных движках.</p></details>
+      <details><summary>Это читы? Меня не забанят?</summary><p>Продукт задуман как тренажёр: разбор своих партий и игра против встроенного ИИ. Применение подсказок в онлайн-играх против людей — на ваше усмотрение и риск.</p></details>
+      <details><summary>Когда запуск и когда спишутся деньги?</summary><p>Готовим ранний доступ. Сейчас деньги не списываются — вы бронируете место и цену. Мы свяжемся, как только откроем, и тогда можно будет оплатить или отказаться.</p></details>
+      <details><summary>На чём это работает?</summary><p>На старте — веб (с телефона и компьютера), дальше мобильное приложение. В форме можно указать, что вам удобнее.</p></details>
+      <details><summary>Почему всего 100 мест?</summary><p>Ранний доступ ограничен, чтобы успевать собирать обратную связь и быстро улучшать продукт. Цена −50% закрепляется только за этими первыми пользователями.</p></details>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="sec-final-cta">
+    <div class="wrap">
+      <div class="final">
+        <h2>Начни выигрывать чаще уже на этой неделе</h2>
+        <p class="lead">Забронируй ранний доступ за 149 ₽ — без оплаты сейчас, с фиксацией цены навсегда.</p>
+        <div style="margin-top:26px;"><button class="btn btn-cta btn-lg" data-cta="preorder">Забрать место за 149&nbsp;₽ →</button></div>
+        <div class="sub-note">Осталось <span id="spots2">37</span> мест из 100</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Проект ИИ-тренера по Дураку · 2026 · <a href="#" data-cta="waitlist">оставить контакт</a> · <a href="/privacy.html">Политика конфиденциальности</a></footer>
+
+  <!-- STICKY MOBILE CTA -->
+  <div class="sticky-cta"><button class="btn btn-cta" data-cta="preorder">Забрать доступ за 149 ₽ →</button></div>
+
+  <!-- MODAL -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <span class="close" id="close">×</span>
+      <div id="form-view">
+        <h3 id="modal-title">Бронируем ранний доступ</h3>
+        <p id="modal-sub">Оставь контакт — сообщим о запуске и закрепим цену 149 ₽.</p>
+        <label for="contact">Telegram или e-mail</label>
+        <input id="contact" type="text" placeholder="@username или mail@example.ru" autocomplete="off" />
+        <div class="err" id="err">Укажите Telegram (@ник) или e-mail.</div>
+        <button class="btn btn-cta" id="submit">Забронировать место →</button>
+        <div class="center sub-note" style="color:var(--muted);">Деньги сейчас не списываются. Только бронь.</div>
+        <div class="center sub-note" style="color:var(--muted);font-size:12px;margin-top:10px;">Оставляя контакт, вы соглашаетесь с <a href="/privacy.html" target="_blank">Политикой обработки персональных данных</a>.</div>
+      </div>
+      <div id="embed-view" style="display:none;">
+        <h3 id="embed-title">Бронируем ранний доступ</h3>
+        <p style="color:var(--muted);font-size:14px;margin:8px 0 14px;">Заполни форму — сообщим о запуске и закрепим цену 149&nbsp;₽. Деньги сейчас не списываются.</p>
+        <div id="embed-slot"></div>
+        <p style="color:var(--muted);font-size:12px;margin-top:10px;text-align:center;">Отправляя форму, вы соглашаетесь с <a href="/privacy.html" target="_blank">Политикой конфиденциальности</a></p>
+      </div>
+      <div class="thanks" id="thanks">
+        <div class="big">🎉</div>
+        <h3>Готово, ты в списке!</h3>
+        <p>Как только откроем ранний доступ — напишем первым и закрепим цену со скидкой 50%. Спасибо!</p>
+        <button class="btn btn-dark" id="close2" style="margin-top:18px;">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== НАСТРОЙКИ (заполнить перед публикацией) =====
+    var CONFIG = {
+      FORM_URL: "https://forms.yandex.ru/u/6a194a14d046887e01fac00d",  // Яндекс.Форма — встраивается в модалку
+      LEAD_ENDPOINT: "",     // свой бэкенд/Telegram-бот (POST {contact,intent})
+      TELEGRAM_CHANNEL: "",  // ссылка на канал — покажем после «спасибо»
+      YM_ID: "109489033",    // Яндекс.Метрика
+      SPOTS_LEFT: 37,        // стартовое число «свободных мест» (scarcity)
+      COUNTDOWN_HOURS: 48    // на сколько часов вперёд таймер (сбрасывается на визитёра)
+    };
+
+    // ===== Яндекс.Метрика =====
+    (function () { if (!CONFIG.YM_ID) return;
+      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+      (window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
+      ym(CONFIG.YM_ID,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});
+    })();
+    function goal(n){ try{ if(CONFIG.YM_ID&&window.ym) ym(CONFIG.YM_ID,"reachGoal",n);}catch(e){} }
+
+    // ===== Scarcity counter =====
+    (function(){
+      document.querySelectorAll(".spots").forEach(function(el){ el.textContent = CONFIG.SPOTS_LEFT; });
+      var s2 = document.getElementById("spots2"); if (s2) s2.textContent = CONFIG.SPOTS_LEFT;
+    })();
+
+    // ===== Countdown (персонально на визитёра, 48ч) =====
+    (function(){
+      var key = "durak_deadline";
+      var dl = Number(localStorage.getItem(key) || 0);
+      if (!dl || dl < Date.now()) { dl = Date.now() + CONFIG.COUNTDOWN_HOURS*3600*1000; localStorage.setItem(key, String(dl)); }
+      function pad(n){ return String(n).padStart(2,"0"); }
+      function tick(){
+        var left = Math.max(0, dl - Date.now());
+        var d = Math.floor(left/86400000), h = Math.floor(left%86400000/3600000), m = Math.floor(left%3600000/60000), s = Math.floor(left%60000/1000);
+        var E=document.getElementById; // shorthand
+        document.getElementById("cd-d").textContent = pad(d);
+        document.getElementById("cd-h").textContent = pad(h);
+        document.getElementById("cd-m").textContent = pad(m);
+        document.getElementById("cd-s").textContent = pad(s);
+      }
+      tick(); setInterval(tick, 1000);
+    })();
+
+    // ===== Modal / leads =====
+    var overlay=document.getElementById("overlay"), formView=document.getElementById("form-view"),
+        thanks=document.getElementById("thanks"), err=document.getElementById("err"),
+        titleEl=document.getElementById("modal-title"), subEl=document.getElementById("modal-sub");
+    var currentIntent="waitlist";
+
+    function showEmbed(intent){
+      var fv=document.getElementById("form-view"); fv.style.display="none";
+      thanks.style.display="none";
+      var ev=document.getElementById("embed-view"); ev.style.display="block";
+      document.getElementById("embed-title").textContent =
+        intent==="preorder" ? "Бронируем ранний доступ — 149 ₽" : "Узнать о запуске";
+      var slot=document.getElementById("embed-slot");
+      if(!slot.dataset.loaded){
+        slot.innerHTML='<iframe src="'+CONFIG.FORM_URL+'?iframe=1" name="ya-form-embed" width="100%" height="500" frameborder="0" style="border:0;border-radius:12px;"></iframe>';
+        var s=document.createElement("script"); s.src="https://forms.yandex.ru/_static/embed.js"; s.async=true; document.body.appendChild(s);
+        slot.dataset.loaded="1";
+      }
+    }
+
+    function openModal(intent){
+      currentIntent=intent;
+      goal(intent==="preorder"?"click_preorder":"click_waitlist");
+      if (CONFIG.FORM_URL){ showEmbed(intent); overlay.classList.add("open"); return; }
+      if (intent==="preorder"){
+        titleEl.textContent="Бронируем ранний доступ — 149 ₽";
+        subEl.textContent="Оставь контакт. Цену 149 ₽ закрепим за тобой навсегда. Деньги спишутся только при запуске.";
+      } else {
+        titleEl.textContent="Узнать о запуске";
+        subEl.textContent="Оставь контакт — сообщим, как только откроем доступ.";
+      }
+      formView.style.display="block"; thanks.style.display="none"; err.style.display="none";
+      overlay.classList.add("open");
+      setTimeout(function(){ document.getElementById("contact").focus(); },50);
+    }
+    function closeModal(){ overlay.classList.remove("open"); }
+
+    document.querySelectorAll("[data-cta]").forEach(function(b){
+      b.addEventListener("click", function(e){ e.preventDefault(); openModal(b.getAttribute("data-cta")); });
+    });
+    document.getElementById("close").onclick=closeModal;
+    document.getElementById("close2").onclick=closeModal;
+    overlay.addEventListener("click", function(e){ if(e.target===overlay) closeModal(); });
+
+    function validContact(v){ v=v.trim(); if(v.length<3) return false;
+      return /^@?[a-zA-Z0-9_]{4,}$/.test(v) || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }
+
+    document.getElementById("submit").onclick=function(){
+      var v=document.getElementById("contact").value.trim();
+      if(!validContact(v)){ err.style.display="block"; return; }
+      err.style.display="none";
+      var lead={contact:v,intent:currentIntent,ts:new Date().toISOString(),ua:navigator.userAgent};
+      if(CONFIG.LEAD_ENDPOINT){ fetch(CONFIG.LEAD_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(lead)}).catch(function(){}); }
+      try{ var a=JSON.parse(localStorage.getItem("durak_leads")||"[]"); a.push(lead); localStorage.setItem("durak_leads",JSON.stringify(a)); }catch(e){}
+      goal(currentIntent==="preorder"?"lead_preorder":"lead_waitlist");
+      formView.style.display="none"; thanks.style.display="block";
+      if(CONFIG.TELEGRAM_CHANNEL){ var p=document.createElement("p");
+        p.innerHTML='Подпишись на канал, чтобы не пропустить запуск: <a href="'+CONFIG.TELEGRAM_CHANNEL+'" target="_blank" style="color:var(--brand);font-weight:700;">перейти в Telegram →</a>';
+        thanks.appendChild(p); }
+    };
+
+    // ===== Отслеживание сабмита Яндекс Формы (iframe postMessage) =====
+    window.addEventListener("message", function(e){
+      if (!e.origin || e.origin.indexOf("yandex.ru") === -1) return;
+      var d = e.data;
+      try { if (typeof d === "string") d = JSON.parse(d); } catch(err){}
+      // Яндекс Формы шлют событие submit разными способами в разных версиях
+      var isSubmit = false;
+      if (typeof d === "object" && d !== null) {
+        isSubmit = d.type === "submit" || d.event === "submit" || d.submitted === true || d.type === "form-submitted";
+      }
+      if (typeof e.data === "string" && (e.data.indexOf("submit") !== -1 || e.data.indexOf("sent") !== -1)) {
+        isSubmit = true;
+      }
+      if (isSubmit) {
+        goal(currentIntent==="preorder" ? "lead_preorder" : "lead_waitlist");
+        // Показать «спасибо» прямо на сайте
+        document.getElementById("embed-view").style.display="none";
+        thanks.style.display="block";
+      }
+    });
+
+    // ===== ПРОДВИНУТАЯ АНАЛИТИКА =====
+    (function(){
+      var fired = {};
+      function once(name){ if(fired[name]) return; fired[name]=true; goal(name); }
+
+      // 1. Глубина скролла
+      window.addEventListener("scroll", function(){
+        var h = document.body.scrollHeight - window.innerHeight;
+        if(!h) return;
+        var p = Math.round(window.scrollY / h * 100);
+        if(p>=25)  once("scroll_25");
+        if(p>=50)  once("scroll_50");
+        if(p>=75)  once("scroll_75");
+        if(p>=100) once("scroll_100");
+      }, {passive:true});
+
+      // 2. Просмотр секций (30% видимости)
+      if(window.IntersectionObserver){
+        var sections = [
+          [".hero",         "seen_hero"],
+          ["#sec-compare",  "seen_compare"],
+          ["#sec-features", "seen_features"],
+          ["#sec-how",      "seen_how"],
+          ["#reviews",      "seen_reviews"],
+          ["#price",        "seen_price"],
+          ["#sec-faq",      "seen_faq"],
+          ["#sec-final-cta","seen_final_cta"]
+        ];
+        var io = new IntersectionObserver(function(entries){
+          entries.forEach(function(e){ if(e.isIntersecting) once(e.target._goalName); });
+        }, {threshold: 0.3});
+        sections.forEach(function(s){
+          var el = document.querySelector(s[0]);
+          if(el){ el._goalName = s[1]; io.observe(el); }
+        });
+      }
+
+      // 3. Время на странице
+      [15, 30, 60, 120, 180].forEach(function(sec){
+        setTimeout(function(){ once("time_" + sec + "s"); }, sec * 1000);
+      });
+
+      // 4. Наведение на CTA (сигнал намерения до клика)
+      document.querySelectorAll(".btn-cta").forEach(function(b){
+        b.addEventListener("pointerenter", function(){ once("hover_cta"); }, {once:true});
+      });
+
+      // 5. Exit intent (только десктоп — мышь ушла вверх)
+      document.addEventListener("mouseleave", function(e){
+        if(e.clientY < 5) once("exit_intent");
+      });
+
+      // 6. Брошенная модалка (открыл — закрыл без сабмита)
+      var _modalWasOpened = false;
+      var _leadSent = false;
+      var origOpen = openModal;
+      openModal = function(intent){
+        _modalWasOpened = true;
+        _leadSent = false;
+        origOpen(intent);
+      };
+      ["close","close2"].forEach(function(id){
+        var btn = document.getElementById(id);
+        if(btn) btn.addEventListener("click", function(){
+          if(_modalWasOpened && !_leadSent) once("modal_abandoned");
+          _modalWasOpened = false;
+        });
+      });
+      document.getElementById("overlay").addEventListener("click", function(e){
+        if(e.target === this && _modalWasOpened && !_leadSent){
+          once("modal_abandoned");
+          _modalWasOpened = false;
+        }
+      });
+      // Помечаем что лид отправлен (postMessage уже стреляет goal, здесь просто флаг)
+      window.addEventListener("message", function(e){
+        if(e.origin && e.origin.indexOf("yandex.ru") !== -1) _leadSent = true;
+      });
+
+      // 7. Какой вопрос FAQ открыли
+      var faqTitles = ["сильный_ии","читы","запуск","платформа","100_мест"];
+      document.querySelectorAll("#sec-faq details summary").forEach(function(s, i){
+        s.addEventListener("click", function(){
+          goal("faq_" + (faqTitles[i] || i+1));
+        });
+      });
+
+      // 8. Sticky CTA — отдельная цель (мобильный трафик vs десктоп)
+      document.querySelectorAll(".sticky-cta .btn").forEach(function(b){
+        b.addEventListener("click", function(){ goal("click_sticky_cta"); });
+      });
+
+      // 9. Клик по гарантии (люди читают мелкий текст — сигнал высокого интереса)
+      var guarantee = document.querySelector(".guarantee");
+      if(guarantee) guarantee.addEventListener("click", function(){ once("click_guarantee"); });
+
+    })();
+
+    // ===== A/B тест заголовка =====
+    (function(){
+      // Случайное распределение 50/50, фиксируется на визит
+      var key = "durak_ab";
+      var v = localStorage.getItem(key);
+      if (!v) { v = Math.random() < 0.5 ? "a" : "b"; localStorage.setItem(key, v); }
+      // Принудительный вариант через ?v=a или ?v=b
+      var param = new URLSearchParams(location.search).get("v");
+      if (param === "a" || param === "b") { v = param; localStorage.setItem(key, v); }
+      // Отправляем вариант в Метрику
+      goal("ab_" + v);
+      // Вариант B — другой заголовок и подзаголовок
+      if (v === "b") {
+        var h1 = document.querySelector(".hero h1");
+        var sub = document.querySelector(".hero .sub");
+        if (h1) h1.innerHTML = 'Узнай лучший ход <span class="u">прямо во время игры</span>';
+        if (sub) sub.textContent = "ИИ-советник анализирует раздачу и показывает оптимальный ход с вероятностью победы — как тренер рядом.";
+      }
+    })();
+  </script>
+</body>
+</html>
