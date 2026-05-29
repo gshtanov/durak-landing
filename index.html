@@ -167,6 +167,10 @@
     .cd span { font-size: 11px; color: var(--muted); }
     .guarantee { display: flex; align-items: center; gap: 14px; max-width: 460px; margin: 22px auto 0; background: rgba(18,183,106,.15); border: 1px solid rgba(18,183,106,.4); border-radius: 14px; padding: 16px 18px; }
     .guarantee .g-ico { font-size: 30px; } .guarantee p { font-size: 14px; color: rgba(255,255,255,.92); }
+    .vstack-row { display:flex; justify-content:space-between; align-items:center; font-size:14px; padding:6px 0; border-bottom:1px solid var(--line); color:var(--ink); }
+    .vstack-row span { color:var(--muted); font-size:13px; white-space:nowrap; margin-left:12px; }
+    .vstack-row.bonus { color:var(--go); font-weight:600; }
+    .vstack-row.bonus span { color:var(--go); font-weight:700; }
 
     /* FAQ */
     details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 22px; margin-top: 12px; box-shadow: 0 4px 14px rgba(20,10,60,.05); }
@@ -243,30 +247,29 @@
 
   <!-- URGENCY BAR -->
   <div class="urg">
-    <span class="urg-full">🔥 Ранний доступ со скидкой <b>−50%</b> · осталось <span class="spots" id="spots">37</span> мест из 100 · цена фиксируется навсегда</span>
-    <span class="urg-short">🔥 <b>−50%</b> · осталось <span class="spots">37</span> мест · цена навсегда</span>
+    <span class="urg-full">⚡ Уже <b>63 человека</b> забронировали место · осталось <span class="spots" id="spots">37</span> из 100 · ранний доступ <b>−50%</b> навсегда</span>
+    <span class="urg-short">⚡ Осталось <span class="spots">37</span> мест · <b>−50%</b> навсегда</span>
   </div>
 
   <!-- HERO -->
   <div class="hero">
     <div class="wrap">
       <div>
-        <span class="badge">🃏 ИИ-тренер · ранний доступ открыт</span>
-        <h1>Обыгрывай в Дурака <span class="u">почти любого</span></h1>
+        <span class="badge">🃏 Для тех, кто устал проигрывать и хочет это исправить</span>
+        <h1>Стань лучшим игроком в Дурака <span class="u">в своей компании</span></h1>
         <p class="sub">
-          ИИ подсказывает лучший ход, показывает вероятность победы в&nbsp;процентах и
-          разбирает твои ошибки после партии. В&nbsp;тестах обыгрывает сильного бота
-          в&nbsp;<b>9&nbsp;партиях из&nbsp;10</b>.
+          ИИ-тренер показывает лучший ход в каждой ситуации, объясняет логику — и разбирает
+          твои ошибки после партии. <b>Гарантируем рост игры за 30 дней</b> — или вернём деньги полностью.
         </p>
         <div class="hero-cta">
-          <button class="btn btn-cta btn-lg" data-cta="preorder">Забрать доступ за 149&nbsp;₽ →</button>
+          <button class="btn btn-cta btn-lg" data-cta="preorder">Забронировать за 149&nbsp;₽ →</button>
           <button class="btn btn-ghost btn-lg" data-cta="waitlist">Узнать о запуске</button>
         </div>
-        <div class="sub-note">💳 Оплата только при запуске · отмена в любой момент</div>
+        <div class="sub-note">💳 Деньги не списываются сейчас · 30-дневная гарантия результата</div>
         <div class="trust">
           <div><b>9/10</b>побед против сильного бота</div>
-          <div><b>10+</b>ходов просчёта вперёд</div>
-          <div><b>0&nbsp;₽</b>пока не запустимся</div>
+          <div><b>30 дней</b>гарантия или возврат</div>
+          <div><b>0&nbsp;₽</b>прямо сейчас</div>
         </div>
       </div>
 
@@ -289,25 +292,53 @@
   <!-- COMPARISON -->
   <section id="sec-compare">
     <div class="wrap">
-      <div class="kicker">Зачем это нужно</div>
-      <h2>Разница, которую видно с первой партии</h2>
+      <div class="kicker">Знакомо?</div>
+      <h2>Ты играешь годами — а уровень не растёт</h2>
       <div class="cmp">
         <div class="col bad">
           <h3>😕 Без тренера</h3>
           <ul>
-            <li>Сливаешь козыри не вовремя</li>
-            <li>Берёшь карты, когда можно было отбиться</li>
-            <li>Не понимаешь, где именно проиграл партию</li>
-            <li>Уровень не растёт годами</li>
+            <li>Слил козыря — думаешь «не повезло», хотя ход был ошибкой</li>
+            <li>Берёшь карты, когда можно было отбиться — и не знаешь об этом</li>
+            <li>Проигрываешь одним и тем же людям снова и снова</li>
+            <li>Играешь 5 лет — уровень такой же, как 5 лет назад</li>
           </ul>
         </div>
         <div class="col good">
           <h3>🚀 С ИИ-тренером</h3>
           <ul>
-            <li>Видишь лучший ход и вероятность победы</li>
-            <li>Понимаешь, почему так, а не иначе</li>
-            <li>Разбор каждой партии: где ошибка и её цена</li>
-            <li>Реальный рост уровня за недели, а не годы</li>
+            <li>После каждой партии — точный разбор: где ошибся и сколько % победы потерял</li>
+            <li>Видишь лучший ход и понимаешь логику — навык остаётся с тобой</li>
+            <li>Через 2 недели замечаешь реальный рост — друзья тоже замечают</li>
+            <li>Больше не надеешься на удачу — играешь умнее всех в компании</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR WHOM -->
+  <section id="sec-forwhom" style="background:#fff;">
+    <div class="wrap" style="max-width:780px;">
+      <div class="kicker">Это не для всех — и это хорошо</div>
+      <h2>Тренер подойдёт тебе, если...</h2>
+      <div class="cmp" style="margin-top:28px;">
+        <div class="col good">
+          <h3>✅ Это для тебя</h3>
+          <ul>
+            <li>Регулярно играешь в дурак — онлайн или с друзьями</li>
+            <li>Хочешь понять <em>почему</em> проигрываешь, а не просто злиться</li>
+            <li>Готов 5 минут после партии разобрать свои ходы</li>
+            <li>Хочешь расти — пусть медленно, но стабильно</li>
+          </ul>
+        </div>
+        <div class="col bad">
+          <h3>❌ Не для тебя</h3>
+          <ul>
+            <li>Ищешь читы для онлайн-казино на реальные деньги</li>
+            <li>Хочешь чтобы ИИ играл <em>вместо</em> тебя</li>
+            <li>Думаешь что дурак — это только про удачу</li>
+            <li>Не готов тратить 5 минут на разбор</li>
           </ul>
         </div>
       </div>
@@ -315,15 +346,15 @@
   </section>
 
   <!-- FEATURES -->
-  <section id="sec-features" style="background:#fff;">
+  <section id="sec-features">
     <div class="wrap">
-      <div class="kicker">Возможности</div>
-      <h2>Не просто бот — личный тренер</h2>
-      <p class="lead">Делает сильнее именно тебя, а не играет вместо тебя.</p>
+      <div class="kicker">Что ты получаешь</div>
+      <h2>Три инструмента, которые меняют игру</h2>
+      <p class="lead">Не просто бот — система, которая делает сильнее именно тебя.</p>
       <div class="cards">
-        <div class="feat"><div class="ico">🎯</div><h3>Лучший ход сейчас</h3><p>Во время партии — оптимальный ход и вероятность победы в процентах. Без догадок.</p></div>
-        <div class="feat"><div class="ico">🔍</div><h3>Разбор партии</h3><p>После игры показывает, где ты ошибся, какой ход был верным и сколько это стоило.</p></div>
-        <div class="feat"><div class="ico">📈</div><h3>Рост уровня</h3><p>Статистика твоих типичных ошибок и прогресса. Видно, как игра крепнет неделя за неделей.</p></div>
+        <div class="feat"><div class="ico">🎯</div><h3>Советник в реальном времени</h3><p>В каждой ситуации — лучший ход и % победы. Больше не гадаешь, а знаешь. <span style="color:var(--muted);font-size:12px;">Отдельно стоило бы: 990 ₽/мес</span></p></div>
+        <div class="feat"><div class="ico">🔍</div><h3>Разбор партии по ходам</h3><p>После игры видишь каждую ошибку: какой ход был верным и сколько процентов победы он стоил. <span style="color:var(--muted);font-size:12px;">Отдельно стоило бы: 490 ₽/мес</span></p></div>
+        <div class="feat"><div class="ico">📈</div><h3>Персональная карта слабых мест</h3><p>Статистика твоих типичных ошибок — видишь прогресс и точно знаешь, над чем работать. <span style="color:var(--muted);font-size:12px;">Отдельно стоило бы: 290 ₽/мес</span></p></div>
       </div>
     </div>
   </section>
@@ -360,35 +391,49 @@
   <!-- PRICING -->
   <section class="price-sec" id="price">
     <div class="wrap">
-      <div class="kicker">Ранний доступ</div>
-      <h2>Зафиксируй −50% навсегда</h2>
-      <p class="lead">Цена раннего доступа сохранится за тобой даже после повышения.</p>
+      <div class="kicker">Ранний доступ · только 100 мест</div>
+      <h2>Всё что нужно для роста — в одном месте</h2>
+      <p class="lead">Суммарная ценность пакета — <b>2 260 ₽/мес</b>. Цена раннего доступа зафиксирована навсегда.</p>
 
       <div class="pricebox">
-        <div class="ribbon">🔥 Только для первых 100 человек</div>
-        <div class="center">
-          <div class="old">299 ₽ / мес</div>
-          <div class="now">149&nbsp;₽<small>/мес</small></div>
+        <div class="ribbon">🔥 Осталось <span class="spots">37</span> мест из 100</div>
+
+        <!-- VALUE STACK -->
+        <div style="margin:18px 0 20px; border-bottom:1px solid var(--line); padding-bottom:18px;">
+          <div style="font-size:13px; font-weight:700; color:var(--muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:.5px;">Что входит в пакет</div>
+          <div class="vstack-row">🎯 Советник в реальном времени <span>990 ₽/мес</span></div>
+          <div class="vstack-row">🔍 Разбор партий с ценой ошибок <span>490 ₽/мес</span></div>
+          <div class="vstack-row">📈 Карта персональных слабых мест <span>290 ₽/мес</span></div>
+          <div class="vstack-row">⚔️ Тренировки против ИИ-соперника <span>390 ₽/мес</span></div>
+          <div style="font-size:13px; font-weight:700; color:var(--go); margin:14px 0 8px;">🎁 Бонусы только для первых 100</div>
+          <div class="vstack-row bonus">PDF «7 ошибок которые убивают партию» <span>бесплатно</span></div>
+          <div class="vstack-row bonus">Приоритетный вход в мобильное приложение <span>бесплатно</span></div>
+          <div class="vstack-row bonus">Закрытый чат первых участников <span>бесплатно</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);">
+            <span style="font-size:14px;color:var(--muted);">Итого ценность:</span>
+            <span style="font-size:18px;font-weight:800;text-decoration:line-through;color:var(--muted);">2 160 ₽/мес</span>
+          </div>
         </div>
+
         <div class="countdown" id="countdown">
           <div class="cd"><b id="cd-d">02</b><span>дней</span></div>
           <div class="cd"><b id="cd-h">00</b><span>часов</span></div>
           <div class="cd"><b id="cd-m">00</b><span>минут</span></div>
           <div class="cd"><b id="cd-s">00</b><span>секунд</span></div>
         </div>
-        <ul>
-          <li>Подсказка лучшего хода + вероятность победы</li>
-          <li>Полный разбор партий с ценой ошибок</li>
-          <li>Статистика прогресса и слабых мест</li>
-          <li>Цена 149 ₽ закреплена навсегда</li>
-        </ul>
-        <button class="btn btn-cta btn-lg" data-cta="preorder" style="width:100%;">Забронировать за 149&nbsp;₽ →</button>
-        <div class="center sub-note" style="color:var(--muted);">💳 Деньги спишутся только при запуске. Сейчас — бронь места и цены.</div>
+
+        <div class="center" style="margin:16px 0 4px;">
+          <div class="old">299 ₽ / мес</div>
+          <div class="now">149&nbsp;₽<small>/мес навсегда</small></div>
+        </div>
+
+        <button class="btn btn-cta btn-lg" data-cta="preorder" style="width:100%;margin-top:16px;">Забронировать место за 149&nbsp;₽ →</button>
+        <div class="center sub-note" style="color:var(--muted);margin-top:10px;">💳 Деньги не списываются сейчас — только бронь места и цены</div>
       </div>
 
       <div class="guarantee">
         <div class="g-ico">🛡️</div>
-        <p><b>Без риска.</b> Сейчас ты ничего не платишь — только бронируешь место и цену. При запуске сможешь отменить в один клик, если не подойдёт.</p>
+        <p><b>30-дневная гарантия результата.</b> Если за первый месяц твоя игра не выросла заметно — вернём 100% без вопросов и без объяснений. Просто напишите нам. Мы уверены в результате.</p>
       </div>
     </div>
   </section>
@@ -398,11 +443,13 @@
     <div class="wrap" style="max-width:780px;">
       <div class="kicker">Вопросы</div>
       <h2>Частые вопросы</h2>
-      <details open><summary>Насколько сильный ИИ на самом деле?</summary><p>В наших тестах движок обыгрывает сильную эвристику примерно в 9 партиях из 10. В основе — поиск по дереву в условиях неполной информации, тот же класс методов, что в покерных солверах и шахматных движках.</p></details>
-      <details><summary>Это читы? Меня не забанят?</summary><p>Продукт задуман как тренажёр: разбор своих партий и игра против встроенного ИИ. Применение подсказок в онлайн-играх против людей — на ваше усмотрение и риск.</p></details>
-      <details><summary>Когда запуск и когда спишутся деньги?</summary><p>Готовим ранний доступ. Сейчас деньги не списываются — вы бронируете место и цену. Мы свяжемся, как только откроем, и тогда можно будет оплатить или отказаться.</p></details>
-      <details><summary>На чём это работает?</summary><p>На старте — веб (с телефона и компьютера), дальше мобильное приложение. В форме можно указать, что вам удобнее.</p></details>
-      <details><summary>Почему всего 100 мест?</summary><p>Ранний доступ ограничен, чтобы успевать собирать обратную связь и быстро улучшать продукт. Цена −50% закрепляется только за этими первыми пользователями.</p></details>
+      <details open><summary>Что если мой уровень не вырастет?</summary><p>Возвращаем 100% денег без вопросов. Просто напишите нам в течение 30 дней после запуска — и мы сделаем полный возврат. Мы настолько уверены в результате, что берём весь риск на себя.</p></details>
+      <details><summary>Насколько сильный ИИ на самом деле?</summary><p>В наших тестах движок обыгрывает сильного бота примерно в 9 партиях из 10. В основе — тот же класс алгоритмов что за покерными солверами и шахматными движками: поиск в условиях неполной информации. Это не эвристика — это математика.</p></details>
+      <details><summary>Мне нужно разбираться в ИИ или программировании?</summary><p>Нет. Вы просто вводите карты — свою руку, карты на столе, козырь. ИИ считает и выдаёт лучший ход с объяснением. Как навигатор: не нужно знать алгоритмы маршрутизации, чтобы им пользоваться.</p></details>
+      <details><summary>Когда запуск и когда спишутся деньги?</summary><p>Деньги не списываются сейчас — вы только бронируете место и цену. Мы свяжемся, как только откроем ранний доступ, и тогда можно будет оплатить или отказаться без каких-либо обязательств.</p></details>
+      <details><summary>Это читы? Меня не забанят?</summary><p>Продукт — это тренажёр и анализ партий. Вы играете против встроенного ИИ и разбираете свои игры. Применение советника в онлайн-играх против живых людей — на ваше усмотрение и риск, мы его не поощряем.</p></details>
+      <details><summary>Почему так дёшево — 149 ₽?</summary><p>Потому что вы — первые 100 пользователей, которые помогут нам сделать продукт лучше. Вы получаете скидку 50% навсегда в обмен на обратную связь. После закрытия раннего доступа цена будет 299 ₽/мес — и ваша ставка уже зафиксирована.</p></details>
+      <details><summary>На чём это работает?</summary><p>Веб-приложение — открывается с телефона и компьютера, без скачивания. Мобильное приложение появится позже. Участники раннего доступа получат его первыми и бесплатно.</p></details>
     </div>
   </section>
 
@@ -410,10 +457,10 @@
   <section id="sec-final-cta">
     <div class="wrap">
       <div class="final">
-        <h2>Начни выигрывать чаще уже на этой неделе</h2>
-        <p class="lead">Забронируй ранний доступ за 149 ₽ — без оплаты сейчас, с фиксацией цены навсегда.</p>
-        <div style="margin-top:26px;"><button class="btn btn-cta btn-lg" data-cta="preorder">Забрать место за 149&nbsp;₽ →</button></div>
-        <div class="sub-note">Осталось <span id="spots2">37</span> мест из 100</div>
+        <h2>Стань лучшим в дурака в своей компании — или вернём деньги</h2>
+        <p class="lead">Забронируй место сейчас · деньги не списываются · 30-дневная гарантия результата · цена 149 ₽ зафиксирована навсегда</p>
+        <div style="margin-top:26px;"><button class="btn btn-cta btn-lg" data-cta="preorder">Забронировать место за 149&nbsp;₽ →</button></div>
+        <div class="sub-note" style="margin-top:10px;">Осталось <span id="spots2">37</span> мест из 100 · 🛡️ 30 дней гарантия или возврат</div>
       </div>
     </div>
   </section>
