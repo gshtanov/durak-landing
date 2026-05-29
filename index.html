@@ -475,17 +475,17 @@
       <span class="close" id="close">×</span>
       <div id="form-view">
         <h3 id="modal-title">Бронируем ранний доступ</h3>
-        <p id="modal-sub">Оставь контакт — сообщим о запуске и закрепим цену 149 ₽.</p>
-        <label for="contact">Telegram или e-mail</label>
-        <input id="contact" type="text" placeholder="@username или mail@example.ru" autocomplete="off" />
-        <div class="err" id="err">Укажите Telegram (@ник) или e-mail.</div>
+        <p id="modal-sub">Введи e-mail — пришлём PDF сразу и сообщим о запуске.</p>
+        <label for="contact">E-mail</label>
+        <input id="contact" type="email" placeholder="mail@example.ru" autocomplete="email" />
+        <div class="err" id="err">Укажите корректный e-mail.</div>
         <button class="btn btn-cta" id="submit">Забронировать место →</button>
         <div class="center sub-note" style="color:var(--muted);">Деньги сейчас не списываются. Только бронь.</div>
         <div class="center sub-note" style="color:var(--muted);font-size:12px;margin-top:10px;">Оставляя контакт, вы соглашаетесь с <a href="privacy.html" target="_blank">Политикой обработки персональных данных</a>.</div>
       </div>
       <div id="embed-view" style="display:none;">
         <h3 id="embed-title">Бронируем ранний доступ</h3>
-        <p style="color:var(--muted);font-size:14px;margin:8px 0 14px;">Заполни форму — сообщим о запуске и закрепим цену 149&nbsp;₽. Деньги сейчас не списываются.</p>
+        <p style="color:var(--muted);font-size:14px;margin:8px 0 14px;">Введи e-mail — PDF придёт сразу, цена 149&nbsp;₽ закрепится навсегда. Деньги сейчас не списываются.</p>
         <div id="embed-slot"></div>
         <p style="color:var(--muted);font-size:12px;margin-top:10px;text-align:center;">Отправляя форму, вы соглашаетесь с <a href="privacy.html" target="_blank">Политикой конфиденциальности</a></p>
       </div>
@@ -568,10 +568,10 @@
       if (CONFIG.FORM_URL){ showEmbed(intent); overlay.classList.add("open"); return; }
       if (intent==="preorder"){
         titleEl.textContent="Бронируем ранний доступ — 149 ₽";
-        subEl.textContent="Оставь контакт. Цену 149 ₽ закрепим за тобой навсегда. Деньги спишутся только при запуске.";
+        subEl.textContent="Введи e-mail — пришлём PDF сразу и закрепим цену 149 ₽ навсегда.";
       } else {
         titleEl.textContent="Узнать о запуске";
-        subEl.textContent="Оставь контакт — сообщим, как только откроем доступ.";
+        subEl.textContent="Введи e-mail — пришлём PDF сразу и сообщим о запуске.";
       }
       formView.style.display="block"; thanks.style.display="none"; err.style.display="none";
       overlay.classList.add("open");
@@ -586,8 +586,8 @@
     document.getElementById("close2").onclick=closeModal;
     overlay.addEventListener("click", function(e){ if(e.target===overlay) closeModal(); });
 
-    function validContact(v){ v=v.trim(); if(v.length<3) return false;
-      return /^@?[a-zA-Z0-9_]{4,}$/.test(v) || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }
+    function validContact(v){ v=v.trim();
+      return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }
 
     document.getElementById("submit").onclick=function(){
       var v=document.getElementById("contact").value.trim();
