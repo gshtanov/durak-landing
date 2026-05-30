@@ -562,9 +562,11 @@
       }
     }
 
+    function abGoal(name){ goal(name); if(window._abVariant) goal(name+"_"+window._abVariant); }
+
     function openModal(intent){
       currentIntent=intent;
-      goal(intent==="preorder"?"click_preorder":"click_waitlist");
+      abGoal(intent==="preorder"?"click_preorder":"click_waitlist");
       if (CONFIG.FORM_URL){ showEmbed(intent); overlay.classList.add("open"); return; }
       if (intent==="preorder"){
         titleEl.textContent="Бронируем ранний доступ — 149 ₽";
@@ -596,7 +598,7 @@
       var lead={contact:v,intent:currentIntent,ts:new Date().toISOString(),ua:navigator.userAgent};
       if(CONFIG.LEAD_ENDPOINT){ fetch(CONFIG.LEAD_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(lead)}).catch(function(){}); }
       try{ var a=JSON.parse(localStorage.getItem("durak_leads")||"[]"); a.push(lead); localStorage.setItem("durak_leads",JSON.stringify(a)); }catch(e){}
-      goal(currentIntent==="preorder"?"lead_preorder":"lead_waitlist");
+      abGoal(currentIntent==="preorder"?"lead_preorder":"lead_waitlist");
       formView.style.display="none"; thanks.style.display="block";
       if(CONFIG.TELEGRAM_CHANNEL){ var p=document.createElement("p");
         p.innerHTML='Подпишись на канал, чтобы не пропустить запуск: <a href="'+CONFIG.TELEGRAM_CHANNEL+'" target="_blank" style="color:var(--brand);font-weight:700;">перейти в Telegram →</a>';
@@ -617,7 +619,7 @@
         isSubmit = true;
       }
       if (isSubmit) {
-        goal(currentIntent==="preorder" ? "lead_preorder" : "lead_waitlist");
+        abGoal(currentIntent==="preorder" ? "lead_preorder" : "lead_waitlist");
         // Показать «спасибо» прямо на сайте
         document.getElementById("embed-view").style.display="none";
         thanks.style.display="block";
@@ -731,6 +733,8 @@
       // Принудительный вариант через ?v=a или ?v=b
       var param = new URLSearchParams(location.search).get("v");
       if (param === "a" || param === "b") { v = param; localStorage.setItem(key, v); }
+      // Делаем вариант доступным глобально для других событий
+      window._abVariant = v;
       // Отправляем вариант в Метрику
       goal("ab_" + v);
       // Вариант B — другой заголовок и подзаголовок
